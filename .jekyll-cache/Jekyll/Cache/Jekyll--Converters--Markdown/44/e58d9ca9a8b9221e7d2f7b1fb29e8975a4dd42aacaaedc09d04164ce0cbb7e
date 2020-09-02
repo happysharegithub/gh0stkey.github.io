@@ -1,0 +1,85 @@
+I"�*<p>感谢倾璇、晏子霜师傅的教导，学习C语言的道路上，个人的第一个C语言小程序诞生了…</p>
+
+<p>希望自己接下来的学习可以戒骄戒躁！</p>
+
+<p>代码如下：</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include &lt;stdio.h&gt;
+#include &lt;time.h&gt;
+#include &lt;string.h&gt;
+</span>
+<span class="kt">char</span> <span class="n">t</span><span class="p">[</span><span class="mi">50</span><span class="p">];</span>
+
+<span class="c1">//文章结构体初始化</span>
+<span class="k">struct</span> <span class="n">initArticle</span><span class="p">{</span>
+	<span class="kt">char</span> <span class="n">title</span><span class="p">[</span><span class="mi">100</span><span class="p">];</span>
+	<span class="kt">char</span> <span class="n">author</span><span class="p">[</span><span class="mi">50</span><span class="p">];</span>
+	<span class="kt">char</span> <span class="n">dtime</span><span class="p">[</span><span class="mi">15</span><span class="p">];</span>
+	<span class="kt">char</span> <span class="n">permalink</span><span class="p">[</span><span class="mi">30</span><span class="p">];</span>
+	<span class="kt">char</span> <span class="n">description</span><span class="p">[</span><span class="mi">200</span><span class="p">];</span>
+<span class="p">};</span>
+
+<span class="k">typedef</span> <span class="k">struct</span> <span class="n">initArticle</span> <span class="n">Paper</span><span class="p">;</span>
+
+<span class="kt">int</span> <span class="nf">getTime</span><span class="p">(){</span> <span class="c1">//获取时间</span>
+	<span class="kt">time_t</span> <span class="n">rawtime</span><span class="p">;</span>
+	<span class="k">struct</span> <span class="n">tm</span> <span class="o">*</span><span class="n">info</span><span class="p">;</span>
+	<span class="kt">int</span> <span class="n">year</span><span class="p">,</span> <span class="n">month</span><span class="p">,</span> <span class="n">day</span><span class="p">;</span>
+	<span class="n">time</span><span class="p">(</span><span class="o">&amp;</span><span class="n">rawtime</span><span class="p">);</span>
+	<span class="n">info</span> <span class="o">=</span> <span class="n">localtime</span><span class="p">(</span><span class="o">&amp;</span><span class="n">rawtime</span><span class="p">);</span>
+	<span class="n">year</span> <span class="o">=</span> <span class="mi">1900</span><span class="o">+</span><span class="p">(</span><span class="n">info</span><span class="o">-&gt;</span><span class="n">tm_year</span><span class="p">);</span>
+	<span class="n">month</span> <span class="o">=</span> <span class="n">info</span><span class="o">-&gt;</span><span class="n">tm_mon</span><span class="o">+</span><span class="mi">1</span><span class="p">;</span>
+	<span class="n">day</span> <span class="o">=</span> <span class="n">info</span><span class="o">-&gt;</span><span class="n">tm_mday</span><span class="p">;</span>
+	
+	<span class="c1">//时间格式 赋值给全局变量t</span>
+	<span class="k">if</span><span class="p">(</span><span class="n">day</span><span class="o">&lt;</span><span class="mi">10</span> <span class="o">&amp;&amp;</span> <span class="n">month</span><span class="o">&lt;</span><span class="mi">10</span><span class="p">){</span>
+		<span class="n">sprintf</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="s">"%d-0%d-0%d"</span><span class="p">,</span> <span class="n">year</span><span class="p">,</span> <span class="n">month</span><span class="p">,</span> <span class="n">day</span><span class="p">);</span>
+	<span class="p">}</span><span class="k">else</span> <span class="k">if</span><span class="p">(</span><span class="n">day</span><span class="o">&lt;</span><span class="mi">10</span><span class="p">){</span>
+		<span class="n">sprintf</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="s">"%d-%d-0%d"</span><span class="p">,</span> <span class="n">year</span><span class="p">,</span> <span class="n">month</span><span class="p">,</span> <span class="n">day</span><span class="p">);</span>
+	<span class="p">}</span><span class="k">else</span> <span class="k">if</span><span class="p">(</span><span class="n">month</span><span class="o">&lt;</span><span class="mi">10</span><span class="p">){</span>
+		<span class="n">sprintf</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="s">"%d-0%d-%d"</span><span class="p">,</span> <span class="n">year</span><span class="p">,</span> <span class="n">month</span><span class="p">,</span> <span class="n">day</span><span class="p">);</span>
+	<span class="p">}</span><span class="k">else</span><span class="p">{</span>
+		<span class="n">sprintf</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="s">"%d-%d-%d"</span><span class="p">,</span> <span class="n">year</span><span class="p">,</span> <span class="n">month</span><span class="p">,</span> <span class="n">day</span><span class="p">);</span>
+	<span class="p">}</span>
+	
+	<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="c1">//主函数</span>
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[]){</span>
+	<span class="n">getTime</span><span class="p">();</span><span class="c1">//获取时间</span>
+	<span class="n">Paper</span> <span class="n">p</span><span class="p">;</span>
+	<span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">51</span><span class="p">]</span> <span class="o">=</span> <span class="sc">'\0'</span><span class="p">;</span>
+	<span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="sc">'\0'</span><span class="p">;</span>
+	<span class="kt">char</span> <span class="o">*</span><span class="n">dt</span><span class="p">[</span><span class="mi">50</span><span class="p">];</span>
+	<span class="o">*</span><span class="n">dt</span> <span class="o">=</span> <span class="n">t</span><span class="p">;</span>
+
+	<span class="kt">char</span> <span class="n">plink</span><span class="p">[</span><span class="mi">30</span><span class="p">];</span>
+	<span class="n">sprintf</span><span class="p">(</span><span class="n">plink</span><span class="p">,</span> <span class="s">"/archives/%s/%s"</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">]);</span>
+
+	<span class="n">strcpy</span><span class="p">(</span><span class="n">p</span><span class="p">.</span><span class="n">dtime</span><span class="p">,</span> <span class="o">*</span><span class="n">dt</span><span class="p">);</span>
+	<span class="n">strcpy</span><span class="p">(</span><span class="n">p</span><span class="p">.</span><span class="n">permalink</span><span class="p">,</span> <span class="n">plink</span><span class="p">);</span>
+	<span class="n">strcpy</span><span class="p">(</span><span class="n">p</span><span class="p">.</span><span class="n">author</span><span class="p">,</span> <span class="s">"Vulkey_Chen"</span><span class="p">);</span>
+
+	<span class="n">printf</span><span class="p">(</span><span class="s">"Title: "</span><span class="p">);</span>
+	<span class="n">scanf</span><span class="p">(</span><span class="s">"%100s"</span><span class="p">,</span> <span class="n">p</span><span class="p">.</span><span class="n">title</span><span class="p">);</span>
+
+	<span class="n">printf</span><span class="p">(</span><span class="s">"Description: "</span><span class="p">);</span>
+	<span class="n">scanf</span><span class="p">(</span><span class="s">"%200s"</span><span class="p">,</span> <span class="n">p</span><span class="p">.</span><span class="n">description</span><span class="p">);</span>
+
+	<span class="kt">FILE</span> <span class="o">*</span><span class="n">fp</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+	<span class="n">strcat</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="s">"-"</span><span class="p">);</span>
+	<span class="n">strcat</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
+	<span class="n">strcat</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="s">".md"</span><span class="p">);</span>
+	<span class="c1">//printf("%s %s", *dt, plink);</span>
+	<span class="n">fp</span> <span class="o">=</span> <span class="n">fopen</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="s">"w"</span><span class="p">);</span>
+	<span class="n">fprintf</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="s">"---</span><span class="se">\n</span><span class="s">layout: post</span><span class="se">\n</span><span class="s">author: %s</span><span class="se">\n</span><span class="s">title: </span><span class="se">\"</span><span class="s">%s</span><span class="se">\"\n</span><span class="s">date: %s</span><span class="se">\n</span><span class="s">music-id: </span><span class="se">\n</span><span class="s">permalink: %s</span><span class="se">\n</span><span class="s">description: </span><span class="se">\"</span><span class="s">%s</span><span class="se">\"\n</span><span class="s">---"</span><span class="p">,</span> <span class="n">p</span><span class="p">.</span><span class="n">author</span><span class="p">,</span> <span class="n">p</span><span class="p">.</span><span class="n">title</span><span class="p">,</span> <span class="n">p</span><span class="p">.</span><span class="n">dtime</span><span class="p">,</span> <span class="n">p</span><span class="p">.</span><span class="n">permalink</span><span class="p">,</span> <span class="n">p</span><span class="p">.</span><span class="n">description</span><span class="p">);</span>
+	<span class="n">fclose</span><span class="p">(</span><span class="n">fp</span><span class="p">);</span>
+	<span class="n">printf</span><span class="p">(</span><span class="s">"File: [%s], create successfully!</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">t</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>运行：</p>
+
+<p><img src="https://vulkey.oss-cn-hangzhou.aliyuncs.com/2018-08-28/a.png" alt="run" /></p>
+:ET
