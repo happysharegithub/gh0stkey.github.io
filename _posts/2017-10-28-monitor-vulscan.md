@@ -45,13 +45,13 @@ filter: match {filter}.{your domain}.ceye.io rule, but limit 20.
 
 那其实很多的都会本文件打交道，不如先造个文件监控出来：
 
-![img](https://vulkey.oss-cn-hangzhou.aliyuncs.com/2017-10-28/0x00.png)
+![img](https://chen-blog-oss.oss-cn-beijing.aliyuncs.com/2017-10-28/0x00.png)
 
 造完监控，不如来写个后台`GET/POST`请求Fuzz，在做这个Fuzz的时候处理的时候遇到很多坑，脚本写的不是很好就不拿出来丢人现眼了~
 
 这里我做的Fuzz是结合`Burpsuite`的`日志`，进行筛选然后Fuzz：
 
-![img](https://vulkey.oss-cn-hangzhou.aliyuncs.com/2017-10-28/0x01.png)
+![img](https://chen-blog-oss.oss-cn-beijing.aliyuncs.com/2017-10-28/0x01.png)
 
 这里筛选的脚本是根据 <https://github.com/tony1016/BurpLogFilter> 去造了一个2.7版本的~
 
@@ -61,7 +61,7 @@ filter: match {filter}.{your domain}.ceye.io rule, but limit 20.
 
 历史Log对比文件监控：
 
-![img](https://vulkey.oss-cn-hangzhou.aliyuncs.com/2017-10-28/0x02.png)
+![img](https://chen-blog-oss.oss-cn-beijing.aliyuncs.com/2017-10-28/0x02.png)
 
 这里Fuzz之后发现有两个文件被修改了，而这两个文件因为有CMS特征的存在就不一一例举了。为什么会被修改呢？因为这里传递的值被写入了文件中，找到对应功能点发现有CSRF，一结合就造成了`CSRF+后台GetWebshell`~
 
@@ -102,7 +102,7 @@ if($HTTP_SERVER_VARS["HTTP_X_FORWARDED_FOR"]){
 
 那其实还可以做一些Fuzz然后实时监控Mysql的SQL执行语句：
 
-![img](https://vulkey.oss-cn-hangzhou.aliyuncs.com/2017-10-28/0x03.png)
+![img](https://chen-blog-oss.oss-cn-beijing.aliyuncs.com/2017-10-28/0x03.png)
 
 首先来看下Mysql的`记录Log功能`开了没有：
 
@@ -110,7 +110,7 @@ if($HTTP_SERVER_VARS["HTTP_X_FORWARDED_FOR"]){
 SHOW VARIABLES LIKE "general_log%";
 ```
 
-![img](https://vulkey.oss-cn-hangzhou.aliyuncs.com/2017-10-28/0x04.png)
+![img](https://chen-blog-oss.oss-cn-beijing.aliyuncs.com/2017-10-28/0x04.png)
 
 看见其的功能OFF了~只要设置下ON就行了：
 
@@ -118,11 +118,11 @@ SHOW VARIABLES LIKE "general_log%";
 SET GLOBAL general_log = 'ON';
 ```
 
-![img](https://vulkey.oss-cn-hangzhou.aliyuncs.com/2017-10-28/0x05.png)
+![img](https://chen-blog-oss.oss-cn-beijing.aliyuncs.com/2017-10-28/0x05.png)
 
 使用BareTail进行监控或者自己根据Log的文本规则监控就行了：
 
-![img](https://vulkey.oss-cn-hangzhou.aliyuncs.com/2017-10-28/0x06.png)
+![img](https://chen-blog-oss.oss-cn-beijing.aliyuncs.com/2017-10-28/0x06.png)
 
 # 结尾
 

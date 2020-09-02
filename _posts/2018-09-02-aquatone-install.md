@@ -55,6 +55,6 @@ Incompatability Error: Nightmarejs must be run on a system with a graphical desk
 
 # 致谢
 
-![use](https://vulkey.oss-cn-hangzhou.aliyuncs.com/2018-09-02%2F0x00.png)
+![use](https://chen-blog-oss.oss-cn-beijing.aliyuncs.com/2018-09-02%2F0x00.png)
 
 感谢https://github.com/michenriksen/aquatone/issues/97中的**ojaschauhan44**

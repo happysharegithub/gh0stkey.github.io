@@ -18,7 +18,7 @@ RGPerson - 随机身份生成
 
 使用方法：python3 RGPerson.py
 
-![rgperson](https://vulkey.oss-cn-hangzhou.aliyuncs.com/2019-08-16/0.png)
+![rgperson](https://chen-blog-oss.oss-cn-beijing.aliyuncs.com/2019-08-16/0.png)
 
 ## 为什么需要Ta
 

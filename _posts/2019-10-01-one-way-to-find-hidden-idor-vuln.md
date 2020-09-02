@@ -24,7 +24,7 @@ First i should test for sensitive information api, because vulnerabilities here 
 
 I found one API about sensitive information -> `../getUserAuth...`
 
-![api](https://vulkey.oss-cn-hangzhou.aliyuncs.com/idor/0.png)
+![api](https://chen-blog-oss.oss-cn-beijing.aliyuncs.com/idor/0.png)
 
 **HTTP Message Body** as follows
 
@@ -50,7 +50,7 @@ I tried to convert **HTTP Response Body** to **HTTP Request Parameters**.
 
 So, i get these parameters (*BurpSuite Plugin*: <https://github.com/gh0stkey/JSONandHTTPP>):
 
-![json2httpp](https://vulkey.oss-cn-hangzhou.aliyuncs.com/idor/1.png)
+![json2httpp](https://chen-blog-oss.oss-cn-beijing.aliyuncs.com/idor/1.png)
 
 ```http
 mobileisbound=01
@@ -75,11 +75,11 @@ Rule -> `English capitalization`
 
 Change the parameter to uppercase with javascript:
 
-![uppercase](https://vulkey.oss-cn-hangzhou.aliyuncs.com/idor/2.png)
+![uppercase](https://chen-blog-oss.oss-cn-beijing.aliyuncs.com/idor/2.png)
 
 God is taking care of people who are careful～I tried to add parameters and i found interesting results.
 
-![result](https://vulkey.oss-cn-hangzhou.aliyuncs.com/idor/3.png)
+![result](https://chen-blog-oss.oss-cn-beijing.aliyuncs.com/idor/3.png)
 
 I successfully **get the sensitive information** of the `account B` based on the credentials of the `account A` !!!
 

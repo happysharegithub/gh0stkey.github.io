@@ -58,43 +58,43 @@ description: "随笔-“互联网安全团队”和“内部运营建设”"
 
 3.强制分享制度落地，加入团队必须了解此制度并参与其中（提高团队交流质量、营造良好学习氛围）
 
-![-w826](https://vulkey.oss-cn-hangzhou.aliyuncs.com/2019-10-22/15717380077758.jpg)
+![-w826](https://chen-blog-oss.oss-cn-beijing.aliyuncs.com/2019-10-22/15717380077758.jpg)
 
 
 4.WIKI平台建设，自主开发WIKI平台，便于知识留存
 
-![-w1208](https://vulkey.oss-cn-hangzhou.aliyuncs.com/2019-10-22/15717380635715.jpg)
+![-w1208](https://chen-blog-oss.oss-cn-beijing.aliyuncs.com/2019-10-22/15717380635715.jpg)
 
 5.安全兵器库建设，团队要吸引优秀人员加入，本身也需要足够优秀的资源，所以内部的安全兵器库建设也不能少
 
 PoCBox脆弱性测试辅助平台：
 
-![-w1677](https://vulkey.oss-cn-hangzhou.aliyuncs.com/2019-10-22/15717381946944.jpg)
+![-w1677](https://chen-blog-oss.oss-cn-beijing.aliyuncs.com/2019-10-22/15717381946944.jpg)
 
 AHRID黑客攻击画像分析平台：
 
-![-w1309](https://vulkey.oss-cn-hangzhou.aliyuncs.com/2019-10-22/15717382820935.jpg)
+![-w1309](https://chen-blog-oss.oss-cn-beijing.aliyuncs.com/2019-10-22/15717382820935.jpg)
 
 漏洞预警平台：
 
-![-w335](https://vulkey.oss-cn-hangzhou.aliyuncs.com/2019-10-22/15717383054304.jpg)
+![-w335](https://chen-blog-oss.oss-cn-beijing.aliyuncs.com/2019-10-22/15717383054304.jpg)
 
 协作平台：
 
-![-w1123](https://vulkey.oss-cn-hangzhou.aliyuncs.com/2019-10-22/15717383304951.jpg)
+![-w1123](https://chen-blog-oss.oss-cn-beijing.aliyuncs.com/2019-10-22/15717383304951.jpg)
 
 MSTLog平台：
 
-![-w1151](https://vulkey.oss-cn-hangzhou.aliyuncs.com/2019-10-22/15717386585719.jpg)
+![-w1151](https://chen-blog-oss.oss-cn-beijing.aliyuncs.com/2019-10-22/15717386585719.jpg)
 
 6.提升团队影响力，在各大SRC和漏洞平台刷榜、参与沙龙和论坛、发布高质量技术思路文章（为“中国互联网安全”发展贡献自己的力量），团队知名了，成员无论是毕业寻找工作还是跳槽，亦或者是其他方向都相对有益
 
 7.内部项目开源，遵从“共享、免费、开源”精神，开源了众多个安全项目
 
-![-w692](https://vulkey.oss-cn-hangzhou.aliyuncs.com/2019-10-22/15717389356000.jpg)
+![-w692](https://chen-blog-oss.oss-cn-beijing.aliyuncs.com/2019-10-22/15717389356000.jpg)
 
 8.运营“微信公众号”、“知乎专栏”
 
-![-w384](https://vulkey.oss-cn-hangzhou.aliyuncs.com/2019-10-22/15717392332175.jpg)
+![-w384](https://chen-blog-oss.oss-cn-beijing.aliyuncs.com/2019-10-22/15717392332175.jpg)
 
-![-w679](https://vulkey.oss-cn-hangzhou.aliyuncs.com/2019-10-22/15717392573147.jpg)
+![-w679](https://chen-blog-oss.oss-cn-beijing.aliyuncs.com/2019-10-22/15717392573147.jpg)
