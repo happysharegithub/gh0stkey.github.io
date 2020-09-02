@@ -9,7 +9,7 @@ url:                . # main url
 baseurl:            
 #permalink:          /:title
 timezone:           Asia/Shanghai # https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
-mathjax:            true  # enables support for mathjax - set to 'false' to disable
+mathjax:            true # enables support for mathjax - set to 'false' to disable
 
 # Site Build
 highlighter:        rouge
