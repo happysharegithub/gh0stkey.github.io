@@ -5,7 +5,7 @@ author_name:        "Vulkey_Chen" # change this to your name
 logo_url:           /assets/avatar.jpg
 
 # Site Settings
-url:                / # main url
+url:                . # main url
 baseurl:            
 #permalink:          /:title
 timezone:           Asia/Shanghai # https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
