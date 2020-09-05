@@ -107,16 +107,6 @@
     
       
         <item>
-          <title>随笔-“互联网安全团队”和“内部运营建设”</title>
-          <description>随笔-“互联网安全团队”和“内部运营建设”</description>
-          <pubDate>2019-10-22T00:00:00+08:00</pubDate>
-          <link>http://localhost:4000/archives/2019-10-22/1</link>
-          <guid isPermaLink="true">http://localhost:4000/archives/2019-10-22/1</guid>
-        </item>
-      
-    
-      
-        <item>
           <title>One Way to Find Hidden IDOR Vulnerability</title>
           <description>One Way to Find Hidden IDOR Vulnerability</description>
           <pubDate>2019-10-01T00:00:00+08:00</pubDate>
@@ -192,16 +182,6 @@
           <pubDate>2019-06-27T00:00:00+08:00</pubDate>
           <link>http://localhost:4000/archives/2019-06-27/1</link>
           <guid isPermaLink="true">http://localhost:4000/archives/2019-06-27/1</guid>
-        </item>
-      
-    
-      
-        <item>
-          <title>2019-03随笔</title>
-          <description>2019-03随笔</description>
-          <pubDate>2019-03-31T00:00:00+08:00</pubDate>
-          <link>http://localhost:4000/archives/2019-03-31/1</link>
-          <guid isPermaLink="true">http://localhost:4000/archives/2019-03-31/1</guid>
         </item>
       
     
